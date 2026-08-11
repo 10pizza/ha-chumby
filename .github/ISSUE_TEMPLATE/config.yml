@@ -1,0 +1,5 @@
+﻿blank_issues_enabled: true
+contact_links:
+  - name: Project documentation
+    url: https://github.com/10pizza/ha-chumby/tree/main/docs
+    about: Check the current documentation before opening a new issue.

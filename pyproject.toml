@@ -1,0 +1,31 @@
+﻿[project]
+name = "ha-chumby"
+version = "0.0.0"
+description = "Home Assistant companion research and tooling for the Chumby Classic"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "License not selected yet" }
+authors = [
+  { name = "ha-chumby contributors" }
+]
+keywords = ["home-assistant", "chumby", "mqtt", "embedded-linux"]
+classifiers = [
+  "Development Status :: 1 - Planning",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Home Automation",
+  "Topic :: System :: Hardware"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = []
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra"

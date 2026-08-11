@@ -1,0 +1,38 @@
+﻿name: Research note
+description: Record a sourced hardware, firmware, or platform finding.
+title: "[Research]: "
+labels: ["research"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Hardware
+        - Boot process
+        - Display
+        - Audio
+        - Touch
+        - Firmware
+        - Networking
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: Finding
+      description: State only what the source supports.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Link to the source for this finding.
+    validations:
+      required: true
+  - type: textarea
+    id: unknowns
+    attributes:
+      label: Unknowns
+      description: List related unknowns or follow-up checks.
