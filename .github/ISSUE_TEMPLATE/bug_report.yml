@@ -1,0 +1,30 @@
+﻿name: Bug report
+description: Report a reproducible problem.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the exact steps needed to reproduce the issue.
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      description: Chumby model and hardware revision.
+      placeholder: Chumby Classic HW 3.7
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or notes
+      render: text
