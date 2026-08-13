@@ -12,6 +12,8 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | [ ] | USB stick contains `/debugchumby.zurk-original`. |
 | [ ] | USB stick contains `/ha-chumby/start.sh`. |
 | [ ] | USB stick contains `/ha-chumby/boot-screen.rgb565`. |
+| [ ] | USB stick contains `/psp/firsttime` with value `0`. |
+| [ ] | USB stick contains `/psp/firsttime.zurk-original` when prepared from the Zurk archive. |
 | [ ] | USB stick remains inserted for validation. |
 | [ ] | Power supply is stable. |
 
@@ -26,6 +28,8 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | [ ] | Splash remains visible for approximately 2-3 seconds. |
 | [ ] | HA-Chumby splash disappears without manual intervention. |
 | [ ] | Original Chumby interface appears automatically. |
+| [ ] | Touchscreen calibration wizard does not appear. |
+| [ ] | Wi-Fi setup wizard does not appear. |
 | [ ] | Widgets become active. |
 | [ ] | No Home Assistant integration starts. |
 | [ ] | No alarm feature starts. |
@@ -52,6 +56,7 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | [ ] | Log contains `start.sh: initial boot screen written`. |
 | [ ] | Log contains `start.sh: sleeping 3 seconds before hand-off`. |
 | [ ] | Log contains `start.sh: exiting HA-Chumby overlay so original Chumby startup can continue`. |
+| [ ] | Log contains `configured-state marker detected`. |
 | [ ] | Log records the Zurk startup exit code. |
 
 ## Reboot Repeatability

@@ -24,7 +24,7 @@ Status: Sprint 10 original-runtime restoration implementation.
 4. The splash remains for about 3 seconds.
 5. Zurk startup runs from USB.
 6. HA-Chumby exits.
-7. Original Chumby UI appears.
+7. Original Chumby UI appears. Sprint 11 requires the USB PSP configured-state marker `/psp/firsttime=0` so this does not enter factory setup.
 8. Widget engine starts.
 9. Chumote `event.cgi` commands affect the running device.
 

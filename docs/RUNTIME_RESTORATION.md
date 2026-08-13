@@ -29,7 +29,7 @@ sequenceDiagram
 
 ## Original Runtime
 
-The original runtime is the stock Chumby UI path that continues after the USB `debugchumby` hook returns. Earlier hardware testing showed that when HA-Chumby exits, the stock setup/calibration flow resumes. Sprint 10 intentionally uses that behavior instead of blocking it.
+The original runtime is the stock Chumby UI path that continues after the USB `debugchumby` hook returns. Earlier hardware testing showed that when HA-Chumby exits, the stock setup/calibration flow resumes if the USB PSP state is marked as first-run. Sprint 11 restores the USB PSP configured-state marker so this hand-off enters the normal runtime path.
 
 The original Zurk startup remains responsible for the Zurk web services. The preserved `/mnt/usb/debugchumby.zurk-original` script starts lighttpd and supporting pieces from the USB stick. HA-Chumby does not recreate that logic.
 
@@ -88,6 +88,10 @@ Manual validation after copying the new overlay to USB:
 | Call `event.cgi?setVolume100` | Volume changes. |
 | Start radio playback | Audio plays through original runtime. |
 | Remove USB and reboot | Device returns to previous non-HA-Chumby behavior. |
+
+## PSP State Dependency
+
+The USB stick is mounted over `/psp`, so the original runtime reads PSP state from USB. Sprint 11 sets `/psp/firsttime` to `0` on the USB stick and preserves the original value as `/psp/firsttime.zurk-original`. See `docs/PSP_CONFIGURATION.md`.
 
 ## Known Limitations
 

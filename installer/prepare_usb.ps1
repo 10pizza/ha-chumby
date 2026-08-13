@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory = $true)]
     [string]$UsbRoot,
 
@@ -48,6 +48,13 @@ Get-ChildItem -LiteralPath $overlayRoot -Force | ForEach-Object {
     Copy-Item -LiteralPath $_.FullName -Destination $resolvedUsb -Recurse -Force
 }
 
+$pspRoot = Join-Path $resolvedUsb "psp"
+$firstTime = Join-Path $pspRoot "firsttime"
+if (Test-Path -LiteralPath $firstTime) {
+    Copy-Item -LiteralPath $firstTime -Destination (Join-Path $pspRoot "firsttime.zurk-original") -Force
+    [System.IO.File]::WriteAllText($firstTime, "0`n", [System.Text.Encoding]::ASCII)
+}
+
 $manifest = @(
     "HA-Chumby USB MVP manifest",
     "Prepared: $(Get-Date -Format o)",
@@ -55,7 +62,9 @@ $manifest = @(
     "Startup entrypoint: /debugchumby",
     "Application: /ha-chumby/start.sh",
     "Boot screen: /ha-chumby/boot-screen.rgb565",
-    "Original Zurk debugchumby backup: /debugchumby.zurk-original if present"
+    "Original Zurk debugchumby backup: /debugchumby.zurk-original if present",
+    "USB PSP configured-state marker: /psp/firsttime=0 when present",
+    "Original Zurk firsttime backup: /psp/firsttime.zurk-original if present"
 )
 Set-Content -LiteralPath (Join-Path $resolvedUsb "HA-CHUMBY-MANIFEST.txt") -Value $manifest -Encoding ASCII
 
@@ -63,7 +72,8 @@ $requiredFiles = @(
     "debugchumby",
     "HA-CHUMBY-MANIFEST.txt",
     "ha-chumby\start.sh",
-    "ha-chumby\boot-screen.rgb565"
+    "ha-chumby\boot-screen.rgb565",
+    "psp\firsttime"
 )
 
 $missing = @()
@@ -79,4 +89,4 @@ if ($missing.Count -gt 0) {
 }
 
 Write-Host "HA-Chumby USB stick prepared at $resolvedUsb"
-Write-Host "Verified debugchumby, HA-CHUMBY-MANIFEST.txt, ha-chumby/start.sh, and ha-chumby/boot-screen.rgb565."
+Write-Host "Verified debugchumby, HA-CHUMBY-MANIFEST.txt, ha-chumby/start.sh, ha-chumby/boot-screen.rgb565, and psp/firsttime."
