@@ -1,13 +1,30 @@
 #!/bin/sh
 # HA-Chumby USB startup entrypoint.
-# This file is placed at the USB root so stock/Zurk boot scripts can discover it.
+# Keep this script in the foreground: returning allows stock boot to continue.
 
+LOG="/tmp/ha-chumby.log"
 USB_ROOT="/mnt/usb"
+APP=""
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') debugchumby: $*" >> "$LOG"
+}
+
+log "starting HA-Chumby USB entrypoint"
+log "PATH=$PATH"
 
 if [ -r "$USB_ROOT/ha-chumby/start.sh" ]; then
-    sh "$USB_ROOT/ha-chumby/start.sh" >> /tmp/ha-chumby.log 2>&1 &
+    APP="$USB_ROOT/ha-chumby/start.sh"
+    log "found app at $APP"
 elif [ -r "/mnt/storage/ha-chumby/start.sh" ]; then
-    sh "/mnt/storage/ha-chumby/start.sh" >> /tmp/ha-chumby.log 2>&1 &
+    APP="/mnt/storage/ha-chumby/start.sh"
+    log "found app at $APP"
 else
-    echo "HA-Chumby startup script not found" >> /tmp/ha-chumby.log
+    log "ERROR: HA-Chumby startup script not found"
+    while true; do
+        sleep 3600
+    done
 fi
+
+log "execing HA-Chumby app in foreground"
+exec sh "$APP"
