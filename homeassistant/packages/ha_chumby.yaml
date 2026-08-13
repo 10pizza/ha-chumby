@@ -1,0 +1,155 @@
+﻿input_text:
+  ha_chumby_base_url:
+    name: HA-Chumby Base URL
+    icon: mdi:web
+    initial: "http://chumby.local"
+    max: 255
+  ha_chumby_speak_text:
+    name: HA-Chumby Speak Text
+    icon: mdi:text-to-speech
+    initial: "Good morning"
+    max: 255
+  ha_chumby_play_url:
+    name: HA-Chumby Play URL
+    icon: mdi:music-note
+    initial: "http://ice1.somafm.com/groovesalad-128-mp3"
+    max: 255
+
+input_number:
+  ha_chumby_volume:
+    name: HA-Chumby Volume
+    icon: mdi:volume-high
+    min: 0
+    max: 100
+    step: 1
+    mode: slider
+    initial: 50
+
+rest_command:
+  ha_chumby_speak:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/speak.pl?action=say&words={{ words | urlencode }}"
+    method: get
+    timeout: 10
+  ha_chumby_set_volume:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/custom/setvol.sh?{{ volume | int(50) }}"
+    method: get
+    timeout: 10
+  ha_chumby_play_url:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/zmote_play.sh?{{ media_url }}"
+    method: get
+    timeout: 10
+    skip_url_encoding: true
+  ha_chumby_stop:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/chumote/event.cgi?stopMusic"
+    method: get
+    timeout: 10
+  ha_chumby_screen_off:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/custom/off.sh"
+    method: get
+    timeout: 10
+  ha_chumby_screen_dim:
+    url: "{{ states('input_text.ha_chumby_base_url') }}/cgi-bin/custom/dim.sh"
+    method: get
+    timeout: 10
+
+script:
+  chumby_speak:
+    alias: HA-Chumby Speak
+    icon: mdi:text-to-speech
+    mode: queued
+    fields:
+      words:
+        name: Text to speak
+        required: false
+        selector:
+          text:
+    sequence:
+      - action: rest_command.ha_chumby_speak
+        data:
+          words: "{{ words | default(states('input_text.ha_chumby_speak_text'), true) }}"
+
+  chumby_set_volume:
+    alias: HA-Chumby Set Volume
+    icon: mdi:volume-high
+    mode: queued
+    fields:
+      volume:
+        name: Volume
+        required: false
+        selector:
+          number:
+            min: 0
+            max: 100
+            step: 1
+            mode: slider
+    sequence:
+      - variables:
+          requested_volume: "{{ volume | default(states('input_number.ha_chumby_volume'), true) | int(50) }}"
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.ha_chumby_volume
+        data:
+          value: "{{ requested_volume }}"
+      - action: rest_command.ha_chumby_set_volume
+        data:
+          volume: "{{ requested_volume }}"
+
+  chumby_play_url:
+    alias: HA-Chumby Play URL
+    icon: mdi:play
+    mode: queued
+    fields:
+      media_url:
+        name: Media URL
+        required: false
+        selector:
+          text:
+    sequence:
+      - action: rest_command.ha_chumby_play_url
+        data:
+          media_url: "{{ media_url | default(states('input_text.ha_chumby_play_url'), true) }}"
+
+  chumby_play_radio:
+    alias: HA-Chumby Play Radio
+    icon: mdi:radio
+    mode: restart
+    sequence:
+      - action: script.chumby_play_url
+        data:
+          media_url: "{{ states('input_text.ha_chumby_play_url') }}"
+
+  chumby_stop:
+    alias: HA-Chumby Stop
+    icon: mdi:stop
+    mode: queued
+    sequence:
+      - action: rest_command.ha_chumby_stop
+
+  chumby_screen_off:
+    alias: HA-Chumby Screen Off
+    icon: mdi:monitor-off
+    mode: queued
+    sequence:
+      - action: rest_command.ha_chumby_screen_off
+
+  chumby_screen_dim:
+    alias: HA-Chumby Screen Dim
+    icon: mdi:brightness-4
+    mode: queued
+    sequence:
+      - action: rest_command.ha_chumby_screen_dim
+
+  chumby_good_morning:
+    alias: HA-Chumby Good Morning
+    icon: mdi:weather-sunset-up
+    mode: restart
+    sequence:
+      - action: script.chumby_set_volume
+        data:
+          volume: "{{ states('input_number.ha_chumby_volume') | int(50) }}"
+      - action: script.chumby_speak
+        data:
+          words: "{{ states('input_text.ha_chumby_speak_text') }}"
+      - delay:
+          seconds: 2
+      - action: script.chumby_play_radio

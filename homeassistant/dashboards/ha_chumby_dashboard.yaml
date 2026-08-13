@@ -1,0 +1,64 @@
+﻿title: HA-Chumby
+views:
+  - title: HA-Chumby
+    path: ha-chumby
+    icon: mdi:alarm
+    cards:
+      - type: entities
+        title: Device Settings
+        entities:
+          - entity: input_text.ha_chumby_base_url
+            name: Chumby base URL
+          - entity: input_text.ha_chumby_speak_text
+            name: Text to speak
+          - entity: input_number.ha_chumby_volume
+            name: Volume
+          - entity: input_text.ha_chumby_play_url
+            name: MP3 or radio URL
+      - type: grid
+        title: Controls
+        columns: 2
+        square: false
+        cards:
+          - type: button
+            name: Speak
+            icon: mdi:text-to-speech
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_speak
+          - type: button
+            name: Set Volume
+            icon: mdi:volume-high
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_set_volume
+          - type: button
+            name: Play Radio
+            icon: mdi:radio
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_play_radio
+          - type: button
+            name: Stop
+            icon: mdi:stop
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_stop
+          - type: button
+            name: Screen Off
+            icon: mdi:monitor-off
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_screen_off
+          - type: button
+            name: Screen Dim
+            icon: mdi:brightness-4
+            tap_action:
+              action: perform-action
+              perform_action: script.chumby_screen_dim
+      - type: button
+        name: Good Morning
+        icon: mdi:weather-sunset-up
+        tap_action:
+          action: perform-action
+          perform_action: script.chumby_good_morning
