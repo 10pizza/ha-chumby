@@ -1,10 +1,12 @@
-﻿# HA-Chumby Control API Inventory
+# HA-Chumby Control API Inventory
 
 Status: Sprint 5 discovery document.
 
 Scope: Existing Zurk Offline Firmware v21 interfaces discovered on the prepared USB stick. This document inventories reusable endpoints only. It does not define a new REST API and does not implement Home Assistant integration.
 
 Discovery source: USB filesystem mounted at `E:\` on 2026-08-13. Important inspected files include `E:\README.TXT`, `E:\lighty\lighttpd.conf`, `E:\lighty\html\index.html`, `E:\lighty\html\chum.js`, `E:\lighty\cgi-bin\*.sh`, `E:\lighty\cgi-bin\custom\*.sh`, and `E:\lighty\cgi-bin\chumote\*.cgi`.
+
+Runtime warning: Sprint 9 hardware validation shows that these discovered Zurk endpoints are not currently reachable through the active HTTP runtime. The running device uses BusyBox httpd, the active document root appears to be /mnt/usb/www, and /cgi-bin/speak.pl returns HTTP 404 even though the extracted Zurk CGI files exist under /mnt/usb/lighty/cgi-bin. Treat this document as a capability inventory until docs/HTTP_SERVER.md and docs/SPRINT9_FINDINGS.md document the restored runtime.
 
 ## Server Model
 

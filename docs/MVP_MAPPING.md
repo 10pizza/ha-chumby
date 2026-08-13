@@ -1,10 +1,12 @@
-﻿# MVP Mapping
+# MVP Mapping
 
 Status: Sprint 5 discovery document.
 
 Scope: Map the current MVP, "a Chumby controlled from Home Assistant that wakes Luka with music based on his school schedule," to existing Zurk Offline Firmware capabilities. This document does not define a new API and does not implement Home Assistant integration.
 
 Evidence sources: USB filesystem mounted at `E:\` on 2026-08-13, especially `E:\README.TXT`, `E:\lighty\lighttpd.conf`, `E:\lighty\html\index.html`, `E:\lighty\html\chum.js`, `E:\lighty\cgi-bin\*.sh`, `E:\lighty\cgi-bin\custom\*.sh`, and `E:\lighty\cgi-bin\chumote\*.cgi`. Project architecture source: `docs\ARCHITECTURE.md`.
+
+Runtime warning: Sprint 9 hardware validation shows that the firmware endpoints selected for reuse are not currently reachable because the active HTTP runtime differs from the Sprint 5 extracted-file inventory. Home Assistant reuse remains the target design, but it is blocked until Sprint 10 restores CGI reachability using the measured BusyBox httpd runtime evidence.
 
 ## Mapping Summary
 
