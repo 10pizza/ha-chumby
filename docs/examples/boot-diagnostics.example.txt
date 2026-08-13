@@ -1,6 +1,6 @@
 # Example boot-diagnostics.txt
 
-This is an example of the expected Sprint 8 diagnostics file shape. It is not a real hardware log.
+This is an example of the expected Sprint 9 diagnostics file shape. It is not a real hardware log.
 
 On real hardware, `installer/overlay/ha-chumby/start.sh` writes the live log to:
 
@@ -10,7 +10,7 @@ and copies it to the USB stick as:
 
 /ha-chumby/boot-diagnostics.txt
 
-===== ha-chumby sprint 8 boot diagnostics =====
+===== ha-chumby sprint 9 boot diagnostics =====
 YYYY-MM-DD HH:MM:SS start.sh: diagnostics started
 YYYY-MM-DD HH:MM:SS start.sh: invoked as: /mnt/usb/ha-chumby/start.sh
 YYYY-MM-DD HH:MM:SS start.sh: APP_DIR=/mnt/usb/ha-chumby
@@ -67,6 +67,10 @@ YYYY-MM-DD HH:MM:SS start.sh: PATH=/sbin:/bin:/usr/sbin:/usr/bin
 <all discovered lighttpd.conf paths>
 --- exit 0: find lighttpd.conf ---
 
+--- find httpd files ---
+<all discovered httpd paths>
+--- exit 0: find httpd files ---
+
 --- find *.cgi ---
 <all discovered CGI files>
 --- exit 0: find *.cgi ---
@@ -87,6 +91,99 @@ YYYY-MM-DD HH:MM:SS start.sh: PATH=/sbin:/bin:/usr/sbin:/usr/bin
 <all discovered cgi-bin directories>
 --- exit 0: find cgi-bin directories ---
 
+===== http runtime process inspection =====
+
+--- ps ---
+<running processes>
+--- exit 0: ps ---
+
+--- http related processes ---
+<httpd, lighty, lighttpd, or busybox process lines>
+--- exit 0: http related processes ---
+
+--- proc details for http processes ---
+<cmdline, comm, exe, cwd, and environment where readable>
+--- exit 0: proc details for http processes ---
+
+===== busybox httpd configuration inspection =====
+
+--- find httpd files ---
+<all discovered httpd paths>
+--- exit 0: find httpd files ---
+
+--- find busybox httpd candidate configs ---
+<httpd.conf, httpd.cfg, and httpd.conf.* paths>
+--- exit 0: find busybox httpd candidate configs ---
+
+===== BEGIN FILE =====
+/path/to/httpd-or-httpd.conf
+<ls -l output>
+--- cat output ---
+<cat stdout/stderr>
+--- cat exit N ---
+--- strings output ---
+<strings stdout/stderr if available>
+--- strings exit N ---
+===== END FILE =====
+
+===== document root and cgi directory inspection =====
+
+--- ls /mnt/usb/www ---
+<directory listing or missing message>
+--- exit 0: ls /mnt/usb/www ---
+
+--- ls /mnt/usb/lighty ---
+<directory listing or missing message>
+--- exit 0: ls /mnt/usb/lighty ---
+
+--- ls /mnt/usb/lighty/cgi-bin ---
+<directory listing or missing message>
+--- exit 0: ls /mnt/usb/lighty/cgi-bin ---
+
+--- ls /mnt/usb/www/cgi-bin ---
+<directory listing or missing message>
+--- exit 0: ls /mnt/usb/www/cgi-bin ---
+
+--- find symlinks under /mnt/usb ---
+<symlink listing or missing message>
+--- exit 0: find symlinks under /mnt/usb ---
+
+--- ls /psp ---
+<directory listing or missing message>
+--- exit 0: ls /psp ---
+
+--- ls /mnt/usb/psp ---
+<directory listing or missing message>
+--- exit 0: ls /mnt/usb/psp ---
+
+--- readlink -f /psp/httpd.conf ---
+<resolved path, readlink failure, or readlink not found>
+--- exit 0: readlink -f /psp/httpd.conf ---
+
+===== busybox httpd capabilities =====
+
+--- busybox ---
+<complete busybox applet output or missing message>
+--- exit 0: busybox ---
+
+--- busybox httpd --help ---
+<complete help output or missing message>
+--- exit 0: busybox httpd --help ---
+
+--- httpd --help ---
+<complete help output or missing message>
+--- exit 0: httpd --help ---
+
+===== permissions inspection =====
+
+--- directory permissions ---
+<directory permission listing>
+--- exit 0: directory permissions ---
+
+--- cgi and perl script permissions ---
+<permissions for *.cgi and *.pl under /mnt/usb>
+--- exit 0: cgi and perl script permissions ---
+
 ===== startup and init scripts =====
 
 --- known startup directories ---
@@ -104,6 +201,10 @@ YYYY-MM-DD HH:MM:SS start.sh: PATH=/sbin:/bin:/usr/sbin:/usr/bin
 --- service control scripts ---
 <lighttpd/httpd/control-panel related files>
 --- exit 0: service control scripts ---
+
+--- startup scripts referencing httpd ---
+<startup files containing httpd, lighttpd, or lighty references>
+--- exit 0: startup scripts referencing httpd ---
 
 ===== lighttpd configuration inspection =====
 
