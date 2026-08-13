@@ -10,6 +10,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+$legacyRadio1Url = "http://66.162.107.142/cpr1_lo"
+$modernRadio1Url = "http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3"
 $overlayRoot = Join-Path $PSScriptRoot "overlay"
 $resolvedUsb = (Resolve-Path -LiteralPath $UsbRoot).Path
 $resolvedZip = (Resolve-Path -LiteralPath $ZurkZip).Path
@@ -55,6 +57,16 @@ if (Test-Path -LiteralPath $firstTime) {
     [System.IO.File]::WriteAllText($firstTime, "0`n", [System.Text.Encoding]::ASCII)
 }
 
+$controlCgi = Join-Path $resolvedUsb "lighty\cgi-bin\chumote\control.cgi"
+if (Test-Path -LiteralPath $controlCgi) {
+    $controlText = [System.IO.File]::ReadAllText($controlCgi)
+    if ($controlText.Contains($legacyRadio1Url)) {
+        Copy-Item -LiteralPath $controlCgi -Destination (Join-Path (Split-Path -Parent $controlCgi) "control.cgi.zurk-original") -Force
+        $patchedControlText = $controlText.Replace($legacyRadio1Url, $modernRadio1Url)
+        [System.IO.File]::WriteAllText($controlCgi, $patchedControlText, [System.Text.Encoding]::ASCII)
+    }
+}
+
 $manifest = @(
     "HA-Chumby USB MVP manifest",
     "Prepared: $(Get-Date -Format o)",
@@ -64,7 +76,9 @@ $manifest = @(
     "Boot screen: /ha-chumby/boot-screen.rgb565",
     "Original Zurk debugchumby backup: /debugchumby.zurk-original if present",
     "USB PSP configured-state marker: /psp/firsttime=0 when present",
-    "Original Zurk firsttime backup: /psp/firsttime.zurk-original if present"
+    "Original Zurk firsttime backup: /psp/firsttime.zurk-original if present",
+    "Radio1 preset: legacy CPR URL replaced with Omrop Fryslan when /lighty/cgi-bin/chumote/control.cgi is present",
+    "Original control.cgi backup: /lighty/cgi-bin/chumote/control.cgi.zurk-original if patched"
 )
 Set-Content -LiteralPath (Join-Path $resolvedUsb "HA-CHUMBY-MANIFEST.txt") -Value $manifest -Encoding ASCII
 
