@@ -1,0 +1,7 @@
+HA-Chumby USB MVP manifest
+Prepared: 2026-08-12T15:07:05.4875037+02:00
+Zurk package expected: zurk_chumby_classic.zip
+Startup entrypoint: /debugchumby
+Application: /ha-chumby/start.sh
+Boot screen: /ha-chumby/boot-screen.rgb565
+Original Zurk debugchumby backup: /debugchumby.zurk-original if present
