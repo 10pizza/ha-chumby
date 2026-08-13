@@ -1,4 +1,8 @@
-# Boot Persistence Design Note
+# Boot Persistence Design
+
+Status: Historical Sprint 4 design. Superseded by Sprint 10 for normal operation.
+
+Sprint 4 intentionally kept HA-Chumby in the foreground to prove USB control. Real hardware later showed that this blocks the original Chumby UI/widget runtime. Current behavior is documented in `docs/RUNTIME_RESTORATION.md`: show the splash briefly, restore Zurk startup, then exit so original boot can continue. Note
 
 Status: Sprint 4 design and implementation note.
 

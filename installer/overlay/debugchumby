@@ -1,6 +1,7 @@
 #!/bin/sh
 # HA-Chumby USB startup entrypoint.
-# Keep this script in the foreground: returning allows stock boot to continue.
+# start.sh is finite: it shows the splash, restores Zurk startup, then exits
+# so the original Chumby boot sequence can continue.
 
 LOG="/tmp/ha-chumby.log"
 USB_ROOT="/mnt/usb"
@@ -21,10 +22,8 @@ elif [ -r "/mnt/storage/ha-chumby/start.sh" ]; then
     log "found app at $APP"
 else
     log "ERROR: HA-Chumby startup script not found"
-    while true; do
-        sleep 3600
-    done
+    exit 1
 fi
 
-log "execing HA-Chumby app in foreground"
+log "execing finite HA-Chumby startup overlay"
 exec sh "$APP"

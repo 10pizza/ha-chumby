@@ -1,5 +1,5 @@
 #!/bin/sh
-# Persistent HA-Chumby boot confirmation screen with Zurk web runtime restoration.
+# Finite HA-Chumby boot splash with original Chumby runtime hand-off.
 
 APP_DIR="$(dirname "$0")"
 IMAGE="$APP_DIR/boot-screen.rgb565"
@@ -9,7 +9,7 @@ USB_ROOT="/mnt/usb"
 ZURK_ORIGINAL="$USB_ROOT/debugchumby.zurk-original"
 ZURK_STARTUP="$USB_ROOT/lighty/startup.sh"
 FRAMEBUFFER=""
-REDRAW_SECONDS=2
+SPLASH_SECONDS=3
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') start.sh: $*" >> "$LOG"
@@ -68,7 +68,8 @@ write_screen() {
 }
 
 initial_diagnostics() {
-    section "ha-chumby sprint 10 startup"
+    : > "$LOG"
+    section "ha-chumby finite boot overlay"
     log "startup diagnostics started"
     log "invoked as: $0"
     log "APP_DIR=$APP_DIR"
@@ -76,16 +77,17 @@ initial_diagnostics() {
     log "USB_DIAGNOSTICS=$USB_DIAGNOSTICS"
     log "ZURK_ORIGINAL=$ZURK_ORIGINAL"
     log "ZURK_STARTUP=$ZURK_STARTUP"
+    log "SPLASH_SECONDS=$SPLASH_SECONDS"
     log "PATH=$PATH"
 
-    section "system before zurk startup"
+    section "system before original startup"
     run_cmd "date" date
     run_cmd "uname -a" uname -a
     run_cmd "cat /proc/cmdline" cat /proc/cmdline
     run_cmd "mount" mount
     run_cmd "df -h" df -h
-    run_cmd "ps before zurk startup" ps
-    run_shell "listening ports before zurk startup" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
+    run_cmd "ps before original startup" ps
+    run_shell "listening ports before original startup" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
 }
 
 show_splash() {
@@ -107,11 +109,14 @@ show_splash() {
     else
         log "ERROR: initial boot screen write failed"
     fi
+
+    log "sleeping $SPLASH_SECONDS seconds before hand-off"
     copy_diagnostics_to_usb
+    sleep "$SPLASH_SECONDS"
 }
 
 restore_zurk_runtime() {
-    section "restore original zurk runtime"
+    section "restore zurk startup"
 
     if [ -r "$ZURK_ORIGINAL" ]; then
         log "executing original Zurk startup: $ZURK_ORIGINAL"
@@ -132,64 +137,25 @@ restore_zurk_runtime() {
         return $status
     fi
 
-    log "ERROR: no Zurk startup script found; runtime not restored"
+    log "WARNING: no Zurk startup script found; returning to original boot anyway"
     copy_diagnostics_to_usb
     return 1
 }
 
-post_startup_diagnostics() {
-    section "system after zurk startup"
-    run_cmd "ps after zurk startup" ps
-    run_shell "listening ports after zurk startup" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
-    run_shell "http related processes after zurk startup" 'ps | grep -i "http"; ps | grep -i "lighty"; ps | grep -i "lighttpd"; ps | grep -i "busybox"'
-    run_shell "lighttpd output marker" 'if [ -e /mnt/usb/tmp/write.ok ]; then ls -l /mnt/usb/tmp/write.ok; cat /mnt/usb/tmp/write.ok; else echo "/mnt/usb/tmp/write.ok missing"; fi'
-}
-
-validate_runtime() {
-    section "runtime validation"
-
-    if ps | grep -i "[l]ighttpd" >/dev/null 2>&1; then
-        log "PASS: lighttpd is running"
-    else
-        log "FAIL: lighttpd is not running"
-    fi
-
-    if ps | grep -i "[h]ttpd" >/dev/null 2>&1; then
-        log "PASS: BusyBox httpd is running"
-    else
-        log "FAIL: BusyBox httpd is not running"
-    fi
-
-    if [ -d /mnt/usb/lighty/cgi-bin ]; then
-        log "PASS: CGI directory exists at /mnt/usb/lighty/cgi-bin"
-    else
-        log "FAIL: CGI directory missing at /mnt/usb/lighty/cgi-bin"
-    fi
-
-    if [ -r /mnt/usb/lighty/cgi-bin/speak.pl ]; then
-        log "PASS: speak.pl exists at /mnt/usb/lighty/cgi-bin/speak.pl"
-    else
-        log "FAIL: speak.pl missing at /mnt/usb/lighty/cgi-bin/speak.pl"
-    fi
-
-    if [ -r /mnt/usb/lighty/lighttpd.conf ]; then
-        log "PASS: lighttpd config exists at /mnt/usb/lighty/lighttpd.conf"
-    else
-        log "FAIL: lighttpd config missing at /mnt/usb/lighty/lighttpd.conf"
-    fi
-
-    copy_diagnostics_to_usb
+final_diagnostics() {
+    section "handoff diagnostics"
+    run_cmd "ps before hand-off exit" ps
+    run_shell "listening ports before hand-off exit" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
+    run_shell "http ui process snapshot" 'ps | grep -i "http"; ps | grep -i "lighty"; ps | grep -i "lighttpd"; ps | grep -i "chumby"; ps | grep -i "flash"; ps | grep -i "control"'
+    run_shell "framebuffer process clues" 'for p in /proc/[0-9]*; do pid=${p#/proc/}; if [ -d "$p/fd" ]; then ls -l "$p/fd" 2>/dev/null | grep "/dev/fb" >/dev/null 2>&1 && echo "pid $pid has framebuffer fd"; fi; done'
+    run_shell "runtime file checks" 'for p in /mnt/usb/lighty/cgi-bin /mnt/usb/lighty/cgi-bin/chumote/event.cgi /mnt/usb/lighty/cgi-bin/speak.pl /mnt/usb/lighty/lighttpd.conf /usr/chumby/scripts/fb_cgi.sh; do if [ -e "$p" ]; then echo "PASS $p"; ls -ld "$p"; else echo "FAIL $p missing"; fi; done'
 }
 
 initial_diagnostics
 show_splash
 restore_zurk_runtime
-post_startup_diagnostics
-validate_runtime
+final_diagnostics
 
-log "entering persistent foreground redraw loop"
+log "exiting HA-Chumby overlay so original Chumby startup can continue"
 copy_diagnostics_to_usb
-while true; do
-    write_screen || log "ERROR: redraw failed"
-    sleep "$REDRAW_SECONDS"
-done
+exit 0

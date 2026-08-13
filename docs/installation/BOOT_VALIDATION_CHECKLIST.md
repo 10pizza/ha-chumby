@@ -1,6 +1,6 @@
 # Boot Validation Checklist
 
-Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after preparing a Sprint 4 USB stick.
+Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after preparing a current HA-Chumby USB stick.
 
 ## Hardware
 
@@ -9,36 +9,50 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | [ ] | Device is Chumby Classic / beanbag HW 3.7. |
 | [ ] | USB stick is prepared with the current `installer/prepare_usb.ps1`. |
 | [ ] | USB stick contains `/debugchumby`. |
+| [ ] | USB stick contains `/debugchumby.zurk-original`. |
 | [ ] | USB stick contains `/ha-chumby/start.sh`. |
 | [ ] | USB stick contains `/ha-chumby/boot-screen.rgb565`. |
-| [ ] | USB stick remains inserted for persistence validation. |
+| [ ] | USB stick remains inserted for validation. |
 | [ ] | Power supply is stable. |
 
-## Boot Proof
+## Boot And Hand-Off Proof
 
 | Done | Check |
 | --- | --- |
 | [ ] | Power on with USB inserted. |
-| [ ] | Screen displays `HA-Chumby`. |
-| [ ] | Screen displays `Boot successful`. |
-| [ ] | Screen displays `Version 0.1`. |
-| [ ] | Screen remains on the HA-Chumby boot screen for at least 60 seconds. |
-| [ ] | Stock setup/calibration flow does not immediately take over the display. |
+| [ ] | Screen briefly displays `HA-Chumby`. |
+| [ ] | Screen briefly displays `Boot successful`. |
+| [ ] | Screen briefly displays `Version 0.1`. |
+| [ ] | Splash remains visible for approximately 2-3 seconds. |
+| [ ] | HA-Chumby splash disappears without manual intervention. |
+| [ ] | Original Chumby interface appears automatically. |
+| [ ] | Widgets become active. |
 | [ ] | No Home Assistant integration starts. |
 | [ ] | No alarm feature starts. |
-| [ ] | No new networking behavior is introduced by HA-Chumby. |
+| [ ] | No internal firmware installer runs. |
+
+## Runtime Control Proof
+
+| Done | Check |
+| --- | --- |
+| [ ] | Chumote web interface is reachable. |
+| [ ] | `event.cgi?wake` changes device state. |
+| [ ] | `event.cgi?setVolume100` changes volume. |
+| [ ] | Radio playback works through the original runtime. |
+| [ ] | `speak.pl` is reachable if TTS is enabled by the restored Zurk runtime. |
 
 ## Log Proof
 
 | Done | Check |
 | --- | --- |
-| [ ] | `/tmp/ha-chumby.log` exists. |
+| [ ] | `/tmp/ha-chumby.log` exists during runtime if readable. |
+| [ ] | `/mnt/usb/ha-chumby/boot-diagnostics.txt` exists on the USB stick. |
 | [ ] | Log contains `debugchumby: starting HA-Chumby USB entrypoint`. |
-| [ ] | Log contains `debugchumby: execing HA-Chumby app in foreground`. |
-| [ ] | Log contains `start.sh: starting HA-Chumby persistent boot screen`. |
+| [ ] | Log contains `debugchumby: execing finite HA-Chumby startup overlay`. |
 | [ ] | Log contains `start.sh: initial boot screen written`. |
-| [ ] | Log contains `start.sh: entering persistent foreground redraw loop`. |
-| [ ] | If available, record whether `stop_control_panel` succeeded or returned non-zero. |
+| [ ] | Log contains `start.sh: sleeping 3 seconds before hand-off`. |
+| [ ] | Log contains `start.sh: exiting HA-Chumby overlay so original Chumby startup can continue`. |
+| [ ] | Log records the Zurk startup exit code. |
 
 ## Reboot Repeatability
 
@@ -46,8 +60,8 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | --- | --- |
 | [ ] | Power off with USB still inserted. |
 | [ ] | Power on with same USB stick. |
-| [ ] | Boot confirmation appears again. |
-| [ ] | Boot confirmation remains visible for at least 60 seconds. |
+| [ ] | HA-Chumby splash appears again. |
+| [ ] | Original Chumby interface appears again after the splash. |
 | [ ] | Repeat for three successful cycles. |
 
 ## No Internal Flash Modification Evidence
@@ -74,5 +88,6 @@ Record:
 - USB brand and capacity.
 - Whether `/tmp/ha-chumby.log` was readable.
 - Last visible screen before failure.
-- Whether stock UI appeared after HA-Chumby.
+- Whether original UI appeared after HA-Chumby.
+- Whether Chumote event commands affected the device.
 - Whether removing USB restored original behavior.
