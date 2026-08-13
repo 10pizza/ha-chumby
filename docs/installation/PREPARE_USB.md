@@ -1,4 +1,4 @@
-﻿# Prepare USB: Bootable HA-Chumby MVP
+# Prepare USB: Bootable HA-Chumby MVP
 
 Status: Sprint 3 MVP preparation guide.
 
@@ -157,7 +157,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 | Done | Check |
 | --- | --- |
 | [ ] | Do not choose SourceForge's install-and-remove-USB flow for this Sprint 3 MVP. |
-| [ ] | Do not run `/debugchumby.zurk-original` until hardware testing proves it does not write internal flash. |
+| [ ] | For Sprint 10 and later, preserve `/debugchumby.zurk-original`; HA-Chumby intentionally runs it after the splash to restore Zurk web services. |
 | [ ] | Keep the USB stick inserted during boot validation. |
 | [ ] | Verify the device still boots its previous behavior when the USB stick is removed. |
 | [ ] | Record whether any persistent settings changed after USB removal. |
@@ -168,6 +168,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 - This project does not verify the full Zurk archive manifest because firmware is not downloaded or redistributed here.
 - The framebuffer asset assumes 320 x 240 RGB565 output, which matches the documented 320 x 240 x 16 display, but must be validated on real hardware. [Chumby Wiki Devices](https://wiki.chumby.com/index.php?title=Devices)
 - The startup script tries `/dev/fb0` and `/dev/fb`; exact framebuffer nodes must be verified on the target unit. [Chumby /dev notes](https://wiki.chumby.com/index.php?title=Chumby_device_settings_information_on_%2Fdev)
+- Sprint 10 restores Zurk web services by running the preserved original Zurk startup from USB after the HA-Chumby splash. See `docs/WEB_RUNTIME.md`.
 - No Home Assistant integration is included.
 - No alarms are included.
 - No networking is added beyond whatever the existing firmware already performs.

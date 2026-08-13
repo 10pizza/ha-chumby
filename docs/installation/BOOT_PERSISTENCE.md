@@ -1,4 +1,4 @@
-﻿# Boot Persistence Design Note
+# Boot Persistence Design Note
 
 Status: Sprint 4 design and implementation note.
 
@@ -57,7 +57,7 @@ Design decisions:
 
 - Keep the USB startup path.
 - Do not write to `/psp`, `/etc`, root filesystem, firmware partitions, or update partitions.
-- Do not run Zurk's original `debugchumby` during Sprint 4 persistence testing.
+- Sprint 4 did not run Zurk's original `debugchumby`; Sprint 10 supersedes that narrow persistence test by running the preserved original Zurk startup after the HA-Chumby splash to restore web services.
 - Keep Chumby-side runtime in shell.
 - Avoid Python because writing a static framebuffer image is already sufficient.
 - Redraw the framebuffer periodically because real hardware showed the stock UI can overwrite the screen after the first draw.

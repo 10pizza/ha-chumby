@@ -1,4 +1,4 @@
-﻿# Boot Validation Checklist
+# Boot Validation Checklist
 
 Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after preparing a Sprint 4 USB stick.
 
@@ -54,7 +54,7 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 
 | Done | Check |
 | --- | --- |
-| [ ] | Do not run `debugchumby.zurk-original`. |
+| [ ] | Confirm `debugchumby.zurk-original` is preserved on USB and runs only from HA-Chumby after the splash. |
 | [ ] | Do not run any official firmware installer menu. |
 | [ ] | Power off. |
 | [ ] | Remove USB stick. |
@@ -62,6 +62,7 @@ Use this checklist on real Chumby Classic / beanbag HW 3.7 hardware after prepar
 | [ ] | Device returns to previous non-HA-Chumby behavior. |
 | [ ] | Record whether any persistent settings changed. |
 | [ ] | Reinsert USB and confirm HA-Chumby behavior returns. |
+| [ ] | Confirm `/mnt/usb/ha-chumby/boot-diagnostics.txt` shows no internal flash write operations from HA-Chumby. |
 
 ## Failure Notes
 
