@@ -1,0 +1,122 @@
+# Example boot-diagnostics.txt
+
+This is an example of the expected Sprint 8 diagnostics file shape. It is not a real hardware log.
+
+On real hardware, `installer/overlay/ha-chumby/start.sh` writes the live log to:
+
+/tmp/ha-chumby.log
+
+and copies it to the USB stick as:
+
+/ha-chumby/boot-diagnostics.txt
+
+===== ha-chumby sprint 8 boot diagnostics =====
+YYYY-MM-DD HH:MM:SS start.sh: diagnostics started
+YYYY-MM-DD HH:MM:SS start.sh: invoked as: /mnt/usb/ha-chumby/start.sh
+YYYY-MM-DD HH:MM:SS start.sh: APP_DIR=/mnt/usb/ha-chumby
+YYYY-MM-DD HH:MM:SS start.sh: USB_DIAGNOSTICS=/mnt/usb/ha-chumby/boot-diagnostics.txt
+YYYY-MM-DD HH:MM:SS start.sh: PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+===== system =====
+
+--- date ---
+<date output from Chumby>
+--- exit 0: date ---
+
+--- uname -a ---
+<kernel and platform output from Chumby>
+--- exit 0: uname -a ---
+
+--- cat /proc/cmdline ---
+<boot command line>
+--- exit 0: cat /proc/cmdline ---
+
+--- mount ---
+<mounted filesystems>
+--- exit 0: mount ---
+
+--- df -h ---
+<filesystem usage>
+--- exit 0: df -h ---
+
+--- env ---
+<boot environment>
+--- exit 0: env ---
+
+--- ps ---
+<running processes>
+--- exit 0: ps ---
+
+===== network =====
+
+--- ifconfig ---
+<network interfaces or ifconfig not found>
+--- exit 0: ifconfig ---
+
+--- route ---
+<routes or route not found>
+--- exit 0: route ---
+
+--- netstat -ln ---
+<listening sockets or netstat not found>
+--- exit 0: netstat -ln ---
+
+===== filesystem discovery =====
+
+--- find lighttpd.conf ---
+<all discovered lighttpd.conf paths>
+--- exit 0: find lighttpd.conf ---
+
+--- find *.cgi ---
+<all discovered CGI files>
+--- exit 0: find *.cgi ---
+
+--- find *.pl ---
+<all discovered Perl files>
+--- exit 0: find *.pl ---
+
+--- find index.html ---
+<all discovered index.html files>
+--- exit 0: find index.html ---
+
+--- find www directories ---
+<all discovered directories named www>
+--- exit 0: find www directories ---
+
+--- find cgi-bin directories ---
+<all discovered cgi-bin directories>
+--- exit 0: find cgi-bin directories ---
+
+===== startup and init scripts =====
+
+--- known startup directories ---
+<directory listings>
+--- exit 0: known startup directories ---
+
+--- debugchumby files ---
+<debugchumby files found at runtime>
+--- exit 0: debugchumby files ---
+
+--- debugchumby file details ---
+<file metadata and first lines for readable debugchumby files>
+--- exit 0: debugchumby file details ---
+
+--- service control scripts ---
+<lighttpd/httpd/control-panel related files>
+--- exit 0: service control scripts ---
+
+===== lighttpd configuration inspection =====
+
+--- lighttpd.conf: /path/to/lighttpd.conf ---
+<selected directive lines>
+--- full config follows: /path/to/lighttpd.conf ---
+<full lighttpd configuration>
+
+===== diagnostics complete =====
+YYYY-MM-DD HH:MM:SS start.sh: diagnostics completed
+YYYY-MM-DD HH:MM:SS start.sh: starting HA-Chumby persistent boot screen
+YYYY-MM-DD HH:MM:SS start.sh: boot screen image found
+YYYY-MM-DD HH:MM:SS start.sh: using framebuffer /dev/fb0
+YYYY-MM-DD HH:MM:SS start.sh: initial boot screen written
+YYYY-MM-DD HH:MM:SS start.sh: entering persistent foreground redraw loop
+
