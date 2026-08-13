@@ -1,18 +1,18 @@
-# Installer
+﻿# Installer
 
-This directory is for installation workflow design and future installer tooling.
+Sprint 3 provides a USB preparation workflow for the bootable Chumby MVP.
 
-No installer code exists yet.
+The installer does not download Zurk Offline Firmware and does not intentionally modify Chumby internal flash. It prepares a USB stick with the user-supplied Zurk Classic archive plus a HA-Chumby startup overlay.
 
-The installer should eventually help with:
+## Files
 
-- Preparing a development image
-- Copying project files to the Chumby
-- Writing local configuration
-- Setting up services
-- Verifying MQTT connectivity
-- Verifying display, touch, and audio hardware
+- `prepare_usb.ps1`: Windows host-side USB preparation script.
+- `overlay/debugchumby`: USB-root startup entrypoint for the Chumby.
+- `overlay/ha-chumby/start.sh`: Minimal shell application that writes the boot screen.
+- `overlay/ha-chumby/boot-screen.rgb565`: 320 x 240 RGB565 boot confirmation screen.
 
-The install process must stay transparent. Users should be able to understand
-what the installer changes on the device.
+## Expected firmware package
 
+Use `zurk_chumby_classic.zip`, the last Zurk Offline Firmware package identified for Chumby Classic.
+
+See `docs/installation/PREPARE_USB.md` for the complete process and safety notes.
