@@ -88,8 +88,16 @@ initial_diagnostics() {
     run_cmd "df -h" df -h
     run_cmd "ps before original startup" ps
     run_shell "listening ports before original startup" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
+    psp_diagnostics
 }
 
+psp_diagnostics() {
+    section "psp configuration state"
+    run_shell "psp mount state" 'mount | grep " /psp " || true; mount | grep "/mnt/usb" || true'
+    run_shell "psp directory listings" 'for d in /psp /mnt/usb/psp; do if [ -e "$d" ]; then echo "### $d"; ls -la "$d"; else echo "$d missing"; fi; done'
+    run_shell "psp key files" 'for f in firsttime ts_settings network_config network_config_bak network_config_off disable_intro volume mute dimlevel daymode_brightness nightmode_brightness hostname flashplayer.cfg; do for base in /psp /mnt/usb/psp; do p="$base/$f"; if [ -e "$p" ]; then echo "### $p"; ls -l "$p"; cat "$p"; echo ""; fi; done; done'
+    run_shell "psp first-run status" 'if [ -r /psp/firsttime ]; then value=$(cat /psp/firsttime); echo "firsttime=$value"; case "$value" in 0) echo "configured-state marker detected" ;; 1) echo "first-run marker detected" ;; *) echo "unknown firsttime value" ;; esac; else echo "/psp/firsttime missing"; fi; if [ -r /psp/ts_settings ]; then echo "touchscreen calibration file present"; else echo "touchscreen calibration file missing"; fi; if [ -r /psp/network_config ]; then echo "network configuration file present"; else echo "network configuration file missing"; fi'
+}
 show_splash() {
     section "ha-chumby splash"
     if [ ! -r "$IMAGE" ]; then
