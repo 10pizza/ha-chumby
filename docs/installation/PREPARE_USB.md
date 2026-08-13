@@ -58,6 +58,7 @@ After running `installer/prepare_usb.ps1`, the USB root must include at least:
 /debugchumby.zurk-original        optional, present when the Zurk archive had debugchumby
 /psp/firsttime                    configured-state marker, set to 0
 /psp/firsttime.zurk-original      backup of original Zurk firsttime value
+/lighty/cgi-bin/chumote/control.cgi.zurk-original  backup when Sprint 12 radio1 URL patch is applied
 /HA-CHUMBY-MANIFEST.txt
 /ha-chumby/start.sh
 /ha-chumby/boot-screen.rgb565
@@ -73,6 +74,7 @@ The USB stick should also contain the other files and directories extracted from
 | `/debugchumby.zurk-original` | Backup of Zurk's original USB-root `debugchumby`, if one was present in the archive. |
 | `/psp/firsttime` | USB PSP configured-state marker. Sprint 11 sets this to `0` so the original runtime does not enter first-run setup. |
 | `/psp/firsttime.zurk-original` | Backup of the Zurk archive first-run marker before HA-Chumby changes it. |
+| `/lighty/cgi-bin/chumote/control.cgi.zurk-original` | Backup of the original Chumote control script when Sprint 12 replaces only the obsolete `radio1` URL. |
 | `/ha-chumby/start.sh` | Minimal shell overlay that logs startup, writes the boot screen to `/dev/fb0` or `/dev/fb`, waits briefly, starts the preserved Zurk runtime, and returns control to the original Chumby boot path. |
 | `/ha-chumby/boot-screen.rgb565` | Pre-rendered 320 x 240 RGB565 image containing the Sprint 3 boot confirmation text. |
 | `/HA-CHUMBY-MANIFEST.txt` | Host-generated preparation manifest. |
@@ -172,6 +174,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 - The startup script tries `/dev/fb0` and `/dev/fb`; exact framebuffer nodes must be verified on the target unit. [Chumby /dev notes](https://wiki.chumby.com/index.php?title=Chumby_device_settings_information_on_%2Fdev)
 - Sprint 10 restores the original runtime by running the preserved Zurk startup from USB after the HA-Chumby splash, then exiting so the original Chumby UI can continue. See `docs/RUNTIME_RESTORATION.md`.
 - Sprint 11 sets the USB PSP `firsttime` marker to `0` during USB preparation so the restored original runtime follows the configured boot path. See `docs/PSP_CONFIGURATION.md`.
+- Sprint 12 replaces only the obsolete `radio1` URL in the USB copy of `control.cgi` when that file is present, preserving `control.cgi.zurk-original`. See `docs/RADIO_PRESETS.md`.
 - No Home Assistant integration is included.
 - No alarms are included.
 - No networking is added beyond whatever the existing firmware already performs.
