@@ -67,9 +67,9 @@ The USB stick should also contain the other files and directories extracted from
 
 | File | Purpose |
 | --- | --- |
-| `/debugchumby` | USB-root startup entrypoint discovered by the Chumby startup process. |
+| `/debugchumby` | USB-root startup entrypoint discovered by the Chumby startup process; it `exec`s HA-Chumby in the foreground so stock boot does not immediately resume. |
 | `/debugchumby.zurk-original` | Backup of Zurk's original USB-root `debugchumby`, if one was present in the archive. |
-| `/ha-chumby/start.sh` | Minimal shell application that writes the boot screen to `/dev/fb0` or `/dev/fb`. |
+| `/ha-chumby/start.sh` | Minimal long-running shell application that logs startup, optionally stops the stock Control Panel, writes the boot screen to `/dev/fb0` or `/dev/fb`, and keeps redrawing it. |
 | `/ha-chumby/boot-screen.rgb565` | Pre-rendered 320 x 240 RGB565 image containing the Sprint 3 boot confirmation text. |
 | `/HA-CHUMBY-MANIFEST.txt` | Host-generated preparation manifest. |
 
@@ -118,6 +118,13 @@ Expected files after a successful run:
 /ha-chumby/boot-screen.rgb565
 ```
 
+## Sprint 4 Persistence Behavior
+
+Sprint 4 changed the USB startup model. `debugchumby` no longer starts HA-Chumby in the background and exits. It now uses `exec sh /mnt/usb/ha-chumby/start.sh` so HA-Chumby becomes the foreground process for the USB startup path.
+
+`start.sh` writes detailed progress to `/tmp/ha-chumby.log`, calls `stop_control_panel` if that stock command is available, writes the boot screen, and redraws the framebuffer every two seconds.
+
+See `docs/installation/BOOT_PERSISTENCE.md` for the design note and source analysis.
 ## Boot Checklist
 
 Run these steps on real Chumby Classic HW 3.7 hardware.
@@ -164,4 +171,3 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 - No Home Assistant integration is included.
 - No alarms are included.
 - No networking is added beyond whatever the existing firmware already performs.
-
