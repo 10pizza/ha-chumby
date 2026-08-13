@@ -1,14 +1,113 @@
 #!/bin/sh
-# Minimal persistent HA-Chumby boot confirmation screen.
+# Persistent HA-Chumby boot confirmation screen with Sprint 8 runtime diagnostics.
 
 APP_DIR="$(dirname "$0")"
 IMAGE="$APP_DIR/boot-screen.rgb565"
 LOG="/tmp/ha-chumby.log"
+USB_DIAGNOSTICS="$APP_DIR/boot-diagnostics.txt"
 FRAMEBUFFER=""
 REDRAW_SECONDS=2
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') start.sh: $*" >> "$LOG"
+}
+
+section() {
+    echo "" >> "$LOG"
+    echo "===== $* =====" >> "$LOG"
+}
+
+run_cmd() {
+    label="$1"
+    shift
+    echo "" >> "$LOG"
+    echo "--- $label ---" >> "$LOG"
+    "$@" >> "$LOG" 2>&1
+    status=$?
+    echo "--- exit $status: $label ---" >> "$LOG"
+    return $status
+}
+
+run_shell() {
+    label="$1"
+    command_text="$2"
+    echo "" >> "$LOG"
+    echo "--- $label ---" >> "$LOG"
+    sh -c "$command_text" >> "$LOG" 2>&1
+    status=$?
+    echo "--- exit $status: $label ---" >> "$LOG"
+    return $status
+}
+
+copy_diagnostics_to_usb() {
+    if [ -n "$USB_DIAGNOSTICS" ] && [ -d "$APP_DIR" ] && [ -r "$LOG" ]; then
+        cp "$LOG" "$USB_DIAGNOSTICS" 2>/dev/null || log "WARNING: failed to copy diagnostics to $USB_DIAGNOSTICS"
+        sync 2>/dev/null || true
+    fi
+}
+
+inspect_lighttpd_configs() {
+    section "lighttpd configuration inspection"
+    find / -name "lighttpd.conf" 2>/dev/null | while read conf; do
+        echo "" >> "$LOG"
+        echo "--- lighttpd.conf: $conf ---" >> "$LOG"
+        if [ -r "$conf" ]; then
+            for pattern in "server.document-root" "cgi.assign" "server.modules" "alias.url" "include"; do
+                grep -n "$pattern" "$conf" >> "$LOG" 2>&1
+            done
+            echo "--- full config follows: $conf ---" >> "$LOG"
+            cat "$conf" >> "$LOG" 2>&1
+        else
+            echo "not readable" >> "$LOG"
+        fi
+    done
+}
+
+list_startup_paths() {
+    section "startup and init scripts"
+    run_shell "known startup directories" 'for d in /etc/init.d /etc/rc.d /etc/rcS.d /etc/rc.d/init.d /mnt/usb /mnt/usb/scripts /mnt/usb/ha-chumby /psp /mnt/usb/psp /usr/chumby/scripts; do if [ -e "$d" ]; then echo "### $d"; ls -la "$d"; fi; done'
+    run_shell "debugchumby files" 'find / -name "debugchumby*" 2>/dev/null'
+    run_shell "debugchumby file details" 'find / -name "debugchumby*" 2>/dev/null | while read f; do echo "### $f"; ls -la "$f"; if [ -r "$f" ]; then head -n 80 "$f"; fi; done'
+    run_shell "service control scripts" 'find / -name "*lighttpd*" -o -name "*httpd*" -o -name "*control_panel*" 2>/dev/null'
+}
+
+run_diagnostics() {
+    : > "$LOG"
+    section "ha-chumby sprint 8 boot diagnostics"
+    log "diagnostics started"
+    log "invoked as: $0"
+    log "APP_DIR=$APP_DIR"
+    log "USB_DIAGNOSTICS=$USB_DIAGNOSTICS"
+    log "PATH=$PATH"
+
+    section "system"
+    run_cmd "date" date
+    run_cmd "uname -a" uname -a
+    run_cmd "cat /proc/cmdline" cat /proc/cmdline
+    run_cmd "mount" mount
+    run_cmd "df -h" df -h
+    run_cmd "env" env
+    run_cmd "ps" ps
+
+    section "network"
+    run_shell "ifconfig" 'if command -v ifconfig >/dev/null 2>&1; then ifconfig; else echo "ifconfig not found"; fi'
+    run_shell "route" 'if command -v route >/dev/null 2>&1; then route; else echo "route not found"; fi'
+    run_shell "netstat -ln" 'if command -v netstat >/dev/null 2>&1; then netstat -ln; else echo "netstat not found"; fi'
+
+    section "filesystem discovery"
+    run_shell "find lighttpd.conf" 'find / -name "lighttpd.conf" 2>/dev/null'
+    run_shell "find *.cgi" 'find / -name "*.cgi" 2>/dev/null'
+    run_shell "find *.pl" 'find / -name "*.pl" 2>/dev/null'
+    run_shell "find index.html" 'find / -name "index.html" 2>/dev/null'
+    run_shell "find www directories" 'find / -name "www" -type d 2>/dev/null'
+    run_shell "find cgi-bin directories" 'find / -name "cgi-bin" -type d 2>/dev/null'
+
+    list_startup_paths
+    inspect_lighttpd_configs
+
+    section "diagnostics complete"
+    log "diagnostics completed"
+    copy_diagnostics_to_usb
 }
 
 find_framebuffer() {
@@ -31,6 +130,7 @@ stop_stock_ui_if_running() {
     else
         log "stop_control_panel not found"
     fi
+    copy_diagnostics_to_usb
 }
 
 write_screen() {
@@ -40,6 +140,8 @@ write_screen() {
     fi
     return 1
 }
+
+run_diagnostics
 
 log "starting HA-Chumby persistent boot screen"
 log "APP_DIR=$APP_DIR"
@@ -66,6 +168,7 @@ else
 fi
 
 log "entering persistent foreground redraw loop"
+copy_diagnostics_to_usb
 while true; do
     write_screen || log "ERROR: redraw failed"
     sleep "$REDRAW_SECONDS"
