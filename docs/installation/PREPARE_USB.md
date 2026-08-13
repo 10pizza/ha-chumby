@@ -118,13 +118,11 @@ Expected files after a successful run:
 /ha-chumby/boot-screen.rgb565
 ```
 
-## Sprint 4 Persistence Behavior
+## Current Boot Overlay Behavior
 
-Sprint 4 changed the USB startup model. `debugchumby` no longer starts HA-Chumby in the background and exits. It now uses `exec sh /mnt/usb/ha-chumby/start.sh` so HA-Chumby becomes the foreground process for the USB startup path.
+Sprint 10 changes the USB startup model from persistent replacement to finite hand-off. `debugchumby` still uses `exec sh /mnt/usb/ha-chumby/start.sh`, but `start.sh` now displays the HA-Chumby splash for approximately 3 seconds, runs the preserved Zurk startup when available, writes diagnostics, and exits so the original Chumby startup sequence can continue.
 
-`start.sh` writes detailed progress to `/tmp/ha-chumby.log`, calls `stop_control_panel` if that stock command is available, writes the boot screen, and redraws the framebuffer every two seconds.
-
-See `docs/installation/BOOT_PERSISTENCE.md` for the design note and source analysis.
+The expected result is a brief HA-Chumby splash followed by the original Chumby interface. See `docs/RUNTIME_RESTORATION.md` for the restored runtime design.
 ## Boot Checklist
 
 Run these steps on real Chumby Classic HW 3.7 hardware.
@@ -139,7 +137,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 | [ ] | Leave the USB stick inserted. |
 | [ ] | Power off the Chumby. |
 | [ ] | Power on the Chumby again with the same USB stick inserted. |
-| [ ] | Confirm the same HA-Chumby boot screen appears again. |
+| [ ] | Confirm the HA-Chumby splash appears, then the original Chumby interface appears again. |
 | [ ] | Repeat at least three power cycles. |
 
 ## Recovery Checklist
@@ -148,7 +146,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 | --- | --- | --- |
 | The Chumby ignores the USB stick. | Re-check FAT32 format, USB root placement, and presence of `/debugchumby`. | [SourceForge README](https://sourceforge.net/projects/zurk/files/), [Chumby tricks](https://wiki.chumby.com/index.php?title=Chumby_tricks#Run_processes_on_start-up) |
 | The Chumby boots but no HA-Chumby screen appears. | Check `/tmp/ha-chumby.log` over SSH if SSH is available. | [Chumby tricks SSH](https://wiki.chumby.com/index.php?title=Chumby_tricks#Open_a_secure_shell_.28SSH.29_console_on_the_chumby) |
-| The screen remains on stock UI. | Verify the USB-root `debugchumby` is the HA-Chumby overlay file, not Zurk's original. | [Chumby tricks startup](https://wiki.chumby.com/index.php?title=Chumby_tricks#Run_processes_on_start-up) |
+| The screen immediately remains on stock UI and the HA-Chumby splash never appears. | Verify the USB-root `debugchumby` is the HA-Chumby overlay file, not Zurk's original. | [Chumby tricks startup](https://wiki.chumby.com/index.php?title=Chumby_tricks#Run_processes_on_start-up) |
 | The display is corrupted. | The framebuffer may use a different node or pixel layout; record the behavior in hardware validation notes. | [Chumby /dev notes](https://wiki.chumby.com/index.php?title=Chumby_device_settings_information_on_%2Fdev) |
 | Official firmware repair is required. | Use Chumby Classic official `1-7-3/update.zip` restore flow from Special Options mode. | [Chumby troubleshooting](https://wiki.chumby.com/index.php?title=Troubleshooting#Firmware_restore) |
 
@@ -168,7 +166,7 @@ Run these steps on real Chumby Classic HW 3.7 hardware.
 - This project does not verify the full Zurk archive manifest because firmware is not downloaded or redistributed here.
 - The framebuffer asset assumes 320 x 240 RGB565 output, which matches the documented 320 x 240 x 16 display, but must be validated on real hardware. [Chumby Wiki Devices](https://wiki.chumby.com/index.php?title=Devices)
 - The startup script tries `/dev/fb0` and `/dev/fb`; exact framebuffer nodes must be verified on the target unit. [Chumby /dev notes](https://wiki.chumby.com/index.php?title=Chumby_device_settings_information_on_%2Fdev)
-- Sprint 10 restores Zurk web services by running the preserved original Zurk startup from USB after the HA-Chumby splash. See `docs/WEB_RUNTIME.md`.
+- Sprint 10 restores the original runtime by running the preserved Zurk startup from USB after the HA-Chumby splash, then exiting so the original Chumby UI can continue. See `docs/RUNTIME_RESTORATION.md`.
 - No Home Assistant integration is included.
 - No alarms are included.
 - No networking is added beyond whatever the existing firmware already performs.
