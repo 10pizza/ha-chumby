@@ -12,8 +12,8 @@ Sprint 12 keeps the original Chumote playback path. The radio button still calls
 | `radio1` resolves to a `playnow` request. | Hardware output includes `OK 101 playnow 0` and `playnow * http://66.162.107.142/cpr1_lo`. | Hardware validation on Chumby `192.168.1.104`. |
 | The legacy CPR stream URL is obsolete for this MVP. | The requested old URL returns HTTP 404 during hardware validation. | Hardware validation. |
 | Earlier firmware inventory located the `radio1`, `radio2`, and `radio3` mappings in `control.cgi`. | `docs/API.md` lists `control.cgi?radio1` as running `btplay http://66.162.107.142/cpr1_lo`. | `docs/API.md`. |
-| A modern Omrop Fryslan MP3 stream URL is available. | Stream listings include `http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3`. | [DELUUXE streamlinks](https://deluuxe.dev/streamlinks), [Spotlist regionale omroepen](https://www.spotlist.store/regio.html). |
-| Patched `radio1` resolves to the Omrop Fryslan URL. | Hardware output includes `playnow * http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3`. | Hardware validation on Chumby `192.168.1.104`. |
+| A modern Omrop Fryslan MP3 stream URL is available. | Stream listings include `https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3`. | [DELUUXE streamlinks](https://deluuxe.dev/streamlinks), [Spotlist regionale omroepen](https://www.spotlist.store/regio.html). |
+| Patched `radio1` resolves to the Omrop Fryslan URL. | Hardware output includes `playnow * https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3`. | Hardware validation on Chumby `192.168.1.104`. |
 | Patched `radio1` does not produce audible playback. | Hardware validation produced no audio and later showed `btplayd` becoming unresponsive after the stream request. | Hardware validation on Chumby `192.168.1.104`. |
 | The custom Flash/UserPlayer stream path executes but is also silent. | `/cgi-bin/custom/multistreams.sh?groovesalad` returned `Now playing groovesalad`, but no audio was heard. | Hardware validation on Chumby `192.168.1.104`. |
 | General audio output still works. | TTS through `/cgi-bin/speak.pl` remains audible. | Hardware validation on Chumby `192.168.1.104`. |
@@ -43,7 +43,7 @@ flowchart TD
 ## Updated Radio 1 URL
 
 ```text
-http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3
+https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
 The installer backs up the original file before patching:
@@ -82,7 +82,7 @@ For an already prepared USB stick, update only the existing USB file after confi
 $control = "E:\lighty\cgi-bin\chumote\control.cgi"
 $backup = "E:\lighty\cgi-bin\chumote\control.cgi.zurk-original"
 $old = "http://66.162.107.142/cpr1_lo"
-$new = "http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3"
+$new = "https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3"
 
 if (-not (Test-Path $backup)) {
     Copy-Item $control $backup -Force

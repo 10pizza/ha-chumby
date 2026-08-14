@@ -14,7 +14,7 @@ The installer now performs a constrained USB-side patch when the full Zurk file 
 
 1. Locate `/lighty/cgi-bin/chumote/control.cgi` on the USB stick.
 2. Preserve the original as `/lighty/cgi-bin/chumote/control.cgi.zurk-original`.
-3. Replace only `http://66.162.107.142/cpr1_lo` with `http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3`.
+3. Replace only `http://66.162.107.142/cpr1_lo` with `https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3`.
 4. Leave `radio2`, `radio3`, `btplayd`, lighttpd, and the Chumote routing unchanged.
 
 ## Rationale
@@ -48,7 +48,7 @@ GET /cgi-bin/chumote/control.cgi?radio1
 should produce a `btplayd` request using:
 
 ```text
-http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3
+https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
 ## Rollback
@@ -88,7 +88,7 @@ Got response: OK 100 reset
 Matched request 100
 Got response: OK 101 playnow 0
 Matched request 101
-playnow * http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3
+playnow * https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
 A later repeat after `radiostop` returned HTTP 200 but showed `btplayd` becoming unhealthy:
@@ -104,7 +104,7 @@ btplaySignalHandler(13) SIGPIPE - ignoring
 Failed to get response
 ...attempting start of btplayd
 Failed to start btplayd
-playnow * http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3
+playnow * https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
 `/cgi-bin/custom/multistreams.sh?groovesalad` executed and returned `Now playing groovesalad`, but no audio was heard. `/cgi-bin/speak.pl` still produces audible TTS, so the audio hardware and basic output path are working.

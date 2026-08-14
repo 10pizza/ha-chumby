@@ -168,7 +168,7 @@ These routes are defined by `E:\lighty\lighttpd.conf`.
 | System | `/cgi-bin/chumote/control.cgi?cp_stop` | `control.cgi` | command. | Call `stop_control_panel`. | Stock Control Panel stops. |
 | System | `/cgi-bin/chumote/control.cgi?reboot` | `control.cgi` | command. | Run `reboot`. | Device reboots. |
 | Radio | `/cgi-bin/chumote/control.cgi?radiostop` | `control.cgi` | command. | Run `btplay stop`. | btplay stops. |
-| Radio | `/cgi-bin/chumote/control.cgi?radio1` | `control.cgi` | command. | Sprint 12 patches the legacy `http://66.162.107.142/cpr1_lo` URL to `http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3` on the USB copy when present. | Sends the patched stream URL to `btplayd`; hardware playback validation required after patch. |
+| Radio | `/cgi-bin/chumote/control.cgi?radio1` | `control.cgi` | command. | Sprint 12 patches the legacy `http://66.162.107.142/cpr1_lo` URL to `https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3` on the USB copy when present. | Sends the patched stream URL to `btplayd`; hardware playback validation required after patch. |
 | Radio | `/cgi-bin/chumote/control.cgi?radio2` | `control.cgi` | command. | Run legacy `btplay http://66.162.107.142/cpr3_lo`. | Legacy preset left unchanged; may be obsolete. |
 | Radio | `/cgi-bin/chumote/control.cgi?radio3` | `control.cgi` | command. | Run legacy `btplay http://66.162.107.142/cpr2_lo`. | Legacy preset left unchanged; may be obsolete. |
 | Media Playback | `/cgi-bin/chumote/control.cgi?playpodcast&<url>` | `control.cgi` | command plus URL as second `&` field. | Run `btplay <url>`. | Podcast/audio URL plays. |
