@@ -103,7 +103,15 @@ radio_diagnostics() {
     section "radio preset diagnostics"
     run_shell "radio candidate files" 'for p in /mnt/usb/lighty/cgi-bin/chumote/control.cgi /mnt/usb/lighty/cgi-bin/chumote/control.cgi.zurk-original /mnt/usb/lighty/cgi-bin/chumote/streams /mnt/usb/lighty/cgi-bin/custom/multistreams.sh /mnt/usb/lighty/cgi-bin/custom/somafm.sh /psp/url_streams /mnt/usb/psp/url_streams /psp/fmradiostation /mnt/usb/psp/fmradiostation; do if [ -e "$p" ]; then echo "PASS $p"; ls -l "$p"; else echo "MISS $p"; fi; done'
     run_shell "radio preset matches" 'for p in /mnt/usb/lighty/cgi-bin/chumote/control.cgi /mnt/usb/lighty/cgi-bin/chumote/control.cgi.zurk-original /mnt/usb/lighty/cgi-bin/chumote/streams /mnt/usb/lighty/cgi-bin/custom/multistreams.sh /mnt/usb/lighty/cgi-bin/custom/somafm.sh /psp/url_streams /mnt/usb/psp/url_streams; do if [ -r "$p" ]; then echo "### $p"; grep -n -iE "radio1|radio2|radio3|playnow|btplay|66\.162\.107\.142|cpr1_lo|omropfryslan|stream|preset|station" "$p" || true; fi; done'
-    run_shell "radio1 resolved url evidence" 'p=/mnt/usb/lighty/cgi-bin/chumote/control.cgi; if [ -r "$p" ]; then if grep -q "icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3" "$p"; then echo "radio1 configured URL: http://icecast.pmedia70.kpnstreaming.nl/omropfryslanlive-OmropFryslanRadio.mp3"; elif grep -q "66.162.107.142/cpr1_lo" "$p"; then echo "radio1 configured URL: http://66.162.107.142/cpr1_lo"; else echo "radio1 configured URL not found by known patterns"; fi; else echo "$p missing or unreadable"; fi'
+    run_shell "radio1 resolved url evidence" 'p=/mnt/usb/lighty/cgi-bin/chumote/control.cgi; if [ -r "$p" ]; then if grep -q "d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3" "$p"; then echo "radio1 configured URL: https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3"; elif grep -q "66.162.107.142/cpr1_lo" "$p"; then echo "radio1 configured URL: http://66.162.107.142/cpr1_lo"; else echo "radio1 configured URL not found by known patterns"; fi; else echo "$p missing or unreadable"; fi'
+}
+
+flashlite_audio_diagnostics() {
+    section "flashlite audio pipeline diagnostics"
+    run_shell "flashlite audio files" 'for p in /mnt/usb/psp/url_streams /mnt/usb/psp/url_streams.sprint13-original /mnt/usb/lighty/cgi-bin/randomshuffler.sh /mnt/usb/lighty/cgi-bin/player.sh /mnt/usb/lighty/cgi-bin/save_streams.sh /mnt/usb/lighty/html/chum.js /mnt/usb/lighty/lighttpd.conf /mnt/usb/controlpanel.swf /mnt/usb/lighty/html/falconwing-ihr_player.swf /mnt/usb/lighty/html/falconwing-pandora_player-2.15.swf; do if [ -e "$p" ]; then echo "PASS $p"; ls -l "$p"; else echo "MISS $p"; fi; done'
+    run_shell "flashlite audio config contents" 'for p in /mnt/usb/psp/url_streams /mnt/usb/psp/url_streams.sprint13-original /mnt/usb/lighty/cgi-bin/randomshuffler.sh /mnt/usb/lighty/cgi-bin/player.sh /mnt/usb/lighty/cgi-bin/save_streams.sh; do if [ -r "$p" ]; then echo "### $p"; cat "$p"; echo ""; fi; done'
+    run_shell "music redirect and cgi mapping" 'p=/mnt/usb/lighty/lighttpd.conf; if [ -r "$p" ]; then grep -n -iE "music\.m3u|randomshuffler|cgi.assign|alias.url|url.redirect" "$p" || true; else echo "$p missing"; fi'
+    run_shell "usb music inventory" 'if [ -d /mnt/usb/music ]; then find /mnt/usb/music -maxdepth 1 -type f | sort; else echo "/mnt/usb/music missing"; fi'
 }
 show_splash() {
     section "ha-chumby splash"
@@ -165,6 +173,7 @@ final_diagnostics() {
     run_shell "framebuffer process clues" 'for p in /proc/[0-9]*; do pid=${p#/proc/}; if [ -d "$p/fd" ]; then ls -l "$p/fd" 2>/dev/null | grep "/dev/fb" >/dev/null 2>&1 && echo "pid $pid has framebuffer fd"; fi; done'
     run_shell "runtime file checks" 'for p in /mnt/usb/lighty/cgi-bin /mnt/usb/lighty/cgi-bin/chumote/event.cgi /mnt/usb/lighty/cgi-bin/speak.pl /mnt/usb/lighty/lighttpd.conf /usr/chumby/scripts/fb_cgi.sh; do if [ -e "$p" ]; then echo "PASS $p"; ls -ld "$p"; else echo "FAIL $p missing"; fi; done'
     radio_diagnostics
+    flashlite_audio_diagnostics
 }
 
 initial_diagnostics
