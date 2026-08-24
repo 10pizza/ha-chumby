@@ -29,7 +29,7 @@ The original Sprint 13 experiment used the earlier Omrop Fryslan URL from Sprint
 https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
-This replacement updates only USB configuration and documented installer defaults; it still preserves the stock FlashLite playback architecture.
+This replacement updated only USB configuration during the Sprint 13 experiment. Sprint 14 retired this installer default because the tested path did not produce reliable audio and interfered with the proven `Random music` path.
 
 ## USB Experiment Applied
 
@@ -51,7 +51,7 @@ Then `/psp/url_streams` was replaced with exactly one stream entry:
 <streams><stream url="https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3" id="" mimetype="audio/mpeg" name="Omrop Fryslan" /></streams>
 ```
 
-The USB manifest was updated with the experiment note.
+The USB manifest was updated with the experiment note during Sprint 13. Sprint 14 later changed the installer to preserve the stock `Random music` configuration instead.
 
 
 ## Direct MP3 Experiment Result
@@ -248,8 +248,8 @@ After booting with the USB stick:
 
 1. Confirm the original Chumby UI starts.
 2. Open the same stock radio/music widget that previously played random audio.
-3. Confirm whether the available station is now `Omrop Fryslan`.
-4. Start playback.
+3. Confirm that the stock `Random music` entry is available.
+4. Start playback from the stock UI.
 5. Record whether audio is heard.
 6. Run:
 
@@ -277,7 +277,7 @@ music.m3u
 
 | Result | Interpretation | Next action |
 | --- | --- | --- |
-| Omrop Fryslan plays audibly from stock widget | Direct stream entries in `/psp/url_streams` are reusable for MVP. | Use `/psp/url_streams` as the radio configuration mechanism. |
+| Random music plays audibly from stock widget | The stock Music Player path is reusable for MVP if its trigger can be discovered. | Sprint 14 investigates the Play-button trigger. |
 | Station appears as `Omrop Fryslan` with type `mp3` but does not play | Confirmed: stock widget sees `/psp/url_streams`, but direct `https` MP3 playback failed. | M3U wrapper was tested next and also failed. |
 | Local M3U wrapper through Play URL does not play | Confirmed: `http://localhost/sample-local.m3u` containing `/mnt/usb/music/sample.mp3` produced no audio through the Zurk/Chumote Play URL control. | Stop using Play URL as proof of the stock widget path; test by selecting the actual stream entry inside the stock FlashLite music/radio widget. |
 | Station does not appear | UI reads a different stream source or cached state. | Inspect `music_sources/show`, FlashLite logs, and profile data. |
@@ -288,7 +288,7 @@ music.m3u
 Restore the original USB configuration:
 
 ```powershell
-Copy-Item E:\psp\url_streams.sprint13-original E:\psp\url_streams -Force
+Copy-Item E:\psp\url_streams.sprint13-original E:\psp\url_streams -Force`r`n# Current Sprint 14 installer preserves this stock configuration by default.
 ```
 
 ## Not Changed

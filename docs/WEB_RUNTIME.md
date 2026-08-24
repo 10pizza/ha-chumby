@@ -66,3 +66,22 @@ The log records startup sequence, executed scripts, exit codes, process snapshot
 - The splash is not persistent by design.
 - Framebuffer owner detection is best-effort only.
 - Home Assistant control remains postponed until hardware confirms the original runtime handles Chumote events again.
+
+## Sprint 14 Runtime Confirmation
+
+Hardware SSH evidence from 2026-08-14 confirmed the restored runtime after the Sprint 14 boot probes were removed:
+
+```text
+/mnt/usb/lighty/sbin/lighttpd -f /mnt/usb/lighty/lighttpd.conf
+0.0.0.0:80 LISTEN
+GET / HTTP/1.1 -> 200
+GET /cgi-bin/logs.sh HTTP/1.1 -> 200
+GET /cgi-bin/chumote/index.cgi HTTP/1.1 -> 200
+```
+
+The same session confirmed the music route remains active:
+
+```text
+GET /music.m3u HTTP/1.1 -> 301 /cgi-bin/randomshuffler.sh
+GET /cgi-bin/randomshuffler.sh HTTP/1.1 -> 200
+```

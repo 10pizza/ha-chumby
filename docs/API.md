@@ -168,7 +168,7 @@ These routes are defined by `E:\lighty\lighttpd.conf`.
 | System | `/cgi-bin/chumote/control.cgi?cp_stop` | `control.cgi` | command. | Call `stop_control_panel`. | Stock Control Panel stops. |
 | System | `/cgi-bin/chumote/control.cgi?reboot` | `control.cgi` | command. | Run `reboot`. | Device reboots. |
 | Radio | `/cgi-bin/chumote/control.cgi?radiostop` | `control.cgi` | command. | Run `btplay stop`. | btplay stops. |
-| Radio | `/cgi-bin/chumote/control.cgi?radio1` | `control.cgi` | command. | Sprint 12 patches the legacy `http://66.162.107.142/cpr1_lo` URL to `https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3` on the USB copy when present. | Sends the patched stream URL to `btplayd`; hardware playback validation required after patch. |
+| Radio | `/cgi-bin/chumote/control.cgi?radio1` | `control.cgi` | command. | Legacy preset path that sends a hardcoded stream URL to `btplayd`; Sprint 12/13 patch experiments were retired in Sprint 14 because they did not produce reliable audio. | Reaches `btplayd` but is not the proven MVP playback path. |
 | Radio | `/cgi-bin/chumote/control.cgi?radio2` | `control.cgi` | command. | Run legacy `btplay http://66.162.107.142/cpr3_lo`. | Legacy preset left unchanged; may be obsolete. |
 | Radio | `/cgi-bin/chumote/control.cgi?radio3` | `control.cgi` | command. | Run legacy `btplay http://66.162.107.142/cpr2_lo`. | Legacy preset left unchanged; may be obsolete. |
 | Media Playback | `/cgi-bin/chumote/control.cgi?playpodcast&<url>` | `control.cgi` | command plus URL as second `&` field. | Run `btplay <url>`. | Podcast/audio URL plays. |
@@ -184,8 +184,8 @@ These routes are defined by `E:\lighty\lighttpd.conf`.
 | Display | `/cgi-bin/message.sh`, `/cgi-bin/fb.sh`, `/cgi-bin/fb1.sh`, `/cgi-bin/chumote/event.cgi?off|dim|bright` | Text display depends on message widget/profile being visible. Framebuffer endpoints are read-only capture. |
 | Audio | `/cgi-bin/chumote/event.cgi?stopAlarm`, volume endpoints | Alarm stop event exists but HA-Chumby alarm logic should remain in Home Assistant for MVP. |
 | TTS | `/cgi-bin/speak.pl?action=say&words=...` | Directly reusable. |
-| Radio | `/cgi-bin/custom/multistreams.sh`, `/cgi-bin/custom/somafm.sh`, `/cgi-bin/chumote/streams`, `/cgi-bin/chumote/control.cgi?radio*` | Predefined endpoints work; arbitrary stream playback is better via `zmote_play.sh` or Chumote playpodcast. |
-| Media Playback | `/cgi-bin/zmote_play.sh`, `/cgi-bin/zmote_playloop.sh`, `/cgi-bin/chumote/control.cgi?playpodcast&...`, `/music.m3u` | Directly useful for wake MP3/radio. |
+| Radio | `/cgi-bin/custom/multistreams.sh`, `/cgi-bin/custom/somafm.sh`, `/cgi-bin/chumote/streams`, `/cgi-bin/chumote/control.cgi?radio*` | Endpoints exist, but Sprint 12/13 hardware tests found several stream/direct playback paths silent or unreliable. |
+| Media Playback | Stock Music Player `Random music` path through `/music.m3u`; direct endpoints such as `/cgi-bin/zmote_play.sh`, `/cgi-bin/zmote_playloop.sh`, and `/cgi-bin/chumote/control.cgi?playpodcast&...` | The stock `Random music` UI path is the only proven audible path. Direct URL endpoints require more evidence before MVP use. |
 | Volume | `/cgi-bin/custom/setvol.sh`, `/cgi-bin/chumote/event.cgi?setVolume*`, `/cgi-bin/custom/setmute.sh` | Directly reusable. |
 | Brightness | `/cgi-bin/custom/off.sh`, `/cgi-bin/custom/dim.sh`, `/cgi-bin/custom/setbrightness.sh`, Chumote bright/dim/off | Directly reusable with hardware validation. |
 | Widgets | profile/show endpoints, widget navigation events, Pandora/offline hosts switch | Useful for stock widget behavior, not primary MVP. |
