@@ -47,6 +47,11 @@ ps >> "$TMP_OUT" 2>&1
 section "key state files"
 copy_file_if_present /tmp/flashplayer.event
 copy_file_if_present /tmp/musicsource
+copy_file_if_present /tmp/.fpcmdsend
+copy_file_if_present /tmp/.fpcmdrecv
+copy_file_if_present /tmp/flashheartbeat
+copy_file_if_present /tmp/movieheartbeat
+copy_file_if_present /tmp/flashplayer_started
 copy_file_if_present /psp/url_streams
 copy_file_if_present /mnt/usb/psp/url_streams
 copy_file_if_present /psp/volume
@@ -58,6 +63,18 @@ for p in /tmp/*event* /tmp/*music* /tmp/*player* /tmp/*btplay*; do
         ls -l "$p" >> "$TMP_OUT" 2>&1
     fi
 done
+
+section "flash command pipes"
+for p in /tmp/.fpcmdsend /tmp/.fpcmdrecv; do
+    if [ -e "$p" ]; then
+        ls -l "$p" >> "$TMP_OUT" 2>&1
+    else
+        write_line "$p not present"
+    fi
+done
+
+section "focused playback processes"
+ps | grep -iE 'chumbyflashplayer|btplayd|chumbpipe|start_control_panel' | grep -v grep >> "$TMP_OUT" 2>&1
 
 section "recent access log music lines"
 if [ -r /mnt/usb/tmp/access.log ]; then
