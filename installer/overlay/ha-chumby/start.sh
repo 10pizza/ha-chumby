@@ -111,7 +111,7 @@ flashlite_audio_diagnostics() {
     run_shell "flashlite audio files" 'for p in /mnt/usb/psp/url_streams /mnt/usb/psp/url_streams.sprint13-original /mnt/usb/lighty/cgi-bin/randomshuffler.sh /mnt/usb/lighty/cgi-bin/player.sh /mnt/usb/lighty/cgi-bin/save_streams.sh /mnt/usb/lighty/html/chum.js /mnt/usb/lighty/lighttpd.conf /mnt/usb/controlpanel.swf /mnt/usb/lighty/html/falconwing-ihr_player.swf /mnt/usb/lighty/html/falconwing-pandora_player-2.15.swf; do if [ -e "$p" ]; then echo "PASS $p"; ls -l "$p"; else echo "MISS $p"; fi; done'
     run_shell "flashlite audio config contents" 'for p in /mnt/usb/psp/url_streams /mnt/usb/psp/url_streams.sprint13-original /mnt/usb/lighty/cgi-bin/randomshuffler.sh /mnt/usb/lighty/cgi-bin/player.sh /mnt/usb/lighty/cgi-bin/save_streams.sh; do if [ -r "$p" ]; then echo "### $p"; cat "$p"; echo ""; fi; done'
     run_shell "music redirect and cgi mapping" 'p=/mnt/usb/lighty/lighttpd.conf; if [ -r "$p" ]; then grep -n -iE "music\.m3u|randomshuffler|cgi.assign|alias.url|url.redirect" "$p" || true; else echo "$p missing"; fi'
-    run_shell "usb music inventory" 'if [ -d /mnt/usb/music ]; then find /mnt/usb/music -maxdepth 1 -type f | sort; else echo "/mnt/usb/music missing"; fi'
+    run_shell "usb music inventory" 'if [ -d /mnt/usb/music ]; then for f in /mnt/usb/music/*; do [ -f "$f" ] && echo "$f"; done | sort; else echo "/mnt/usb/music missing"; fi'
 }
 show_splash() {
     section "ha-chumby splash"

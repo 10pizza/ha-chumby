@@ -2,7 +2,7 @@
 
 Status: Sprint 12 radio preset modernization reference.
 
-Sprint 12 keeps the original Chumote playback path. The radio button still calls `control.cgi?radio1`, `control.cgi` still talks to `btplayd`, and `btplayd` still performs playback. The only intended change is replacing the obsolete `radio1` stream URL.
+Sprint 12 investigated the original Chumote playback path. The radio button still calls `control.cgi?radio1`, `control.cgi` still talks to `btplayd`, and `btplayd` receives playback requests. Sprint 14 retired the installer-side radio patch because hardware testing showed patched direct stream playback was not reliable.
 
 ## Confirmed Runtime Behavior
 
@@ -36,7 +36,7 @@ flowchart TD
 
 | Preset | Current evidence | Sprint 12 action |
 | --- | --- | --- |
-| `radio1` | Hardware output and `docs/API.md` show the URL is resolved by `control.cgi`. No separate preset database has been proven yet. | Patch only the legacy `radio1` URL in `control.cgi` during USB preparation, preserving a backup. |
+| `radio1` | Hardware output and `docs/API.md` show the URL is resolved by `control.cgi`. No separate preset database has been proven yet. | Historical experiment only. Do not patch during normal USB preparation until the stock playback trigger is understood. |
 | `radio2` | Earlier inventory shows `control.cgi` maps it to `http://66.162.107.142/cpr3_lo`. | Leave unchanged. |
 | `radio3` | Earlier inventory shows `control.cgi` maps it to `http://66.162.107.142/cpr2_lo`. | Leave unchanged. |
 
@@ -46,7 +46,7 @@ flowchart TD
 https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3
 ```
 
-The installer backs up the original file before patching:
+The retired Sprint 12 experiment backed up the original file before patching:
 
 ```text
 /mnt/usb/lighty/cgi-bin/chumote/control.cgi.zurk-original
@@ -65,7 +65,7 @@ Sprint 12 modernized preset lookup but did not achieve audible radio playback.
 
 | Playback path | Result | Interpretation |
 | --- | --- | --- |
-| `control.cgi?radio1` -> `btplay` -> `btplayd` | Resolves patched URL, then no audio; repeat attempts can wedge `btplayd`. | Preset lookup is fixed; `btplayd` stream playback needs separate diagnostics. |
+| `control.cgi?radio1` -> `btplay` -> `btplayd` | Resolves patched URL in the retired experiment, then no audio; repeat attempts can wedge `btplayd`. | Do not use this as the MVP playback path until the stock Music Player trigger is understood. |
 | `custom/multistreams.sh?groovesalad` -> Flash `UserPlayer` event | Script executes and returns `Now playing groovesalad`, but no audio. | Stream playback is not working through the Flash/UserPlayer event path either. |
 | `speak.pl` TTS | Audible. | Audio hardware and mixer are not globally broken. |
 | Stock radio widget random stream | Audible. | The stock widget has a working `/music.m3u` -> `randomshuffler.sh` playback path that Sprint 13 should discover and reuse. |
@@ -74,33 +74,17 @@ Sprint 12 modernized preset lookup but did not achieve audible radio playback.
 Do not treat radio silence as a preset database failure. The next investigation belongs to audio/player diagnostics.
 ## Update Procedure
 
-For a newly prepared USB stick, run the normal preparation script. If `lighty/cgi-bin/chumote/control.cgi` exists and contains the legacy `radio1` URL, the installer replaces only that URL and records the change in `HA-CHUMBY-MANIFEST.txt`.
+For Sprint 14 and later investigation USB sticks, run the normal preparation script and preserve the stock music configuration. Do not patch `control.cgi` or `/psp/url_streams` during preparation; the proven path is the stock Music Player `Random music` entry.
 
-For an already prepared USB stick, update only the existing USB file after confirming it contains the legacy URL:
-
-```powershell
-$control = "E:\lighty\cgi-bin\chumote\control.cgi"
-$backup = "E:\lighty\cgi-bin\chumote\control.cgi.zurk-original"
-$old = "http://66.162.107.142/cpr1_lo"
-$new = "https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3"
-
-if (-not (Test-Path $backup)) {
-    Copy-Item $control $backup -Force
-}
-
-$text = [System.IO.File]::ReadAllText($control)
-if ($text.Contains($old)) {
-    [System.IO.File]::WriteAllText($control, $text.Replace($old, $new), [System.Text.Encoding]::ASCII)
-}
-```
+The Sprint 12 URL patch procedure is retained only as historical evidence. Do not repeat it for the MVP until the stock Music Player trigger is understood and hardware evidence shows that direct preset playback is usable.
 
 ## Adding New Stations
 
-Do not add new stations by creating a replacement player. First locate whether the target preset is stored in `control.cgi`, `/psp/url_streams`, or another Zurk configuration file. Prefer changing data files over script edits. If the preset is hardcoded, patch only the exact URL and preserve the original file.
+Do not add new stations by creating a replacement player. First locate whether the target preset is stored in `control.cgi`, `/psp/url_streams`, or another Zurk configuration file. Prefer changing data files over script edits. Sprint 14 evidence says the stock player trigger must be understood before adding new stations for MVP use.
 
 ## Restoring Defaults
 
-Rollback is USB-only:
+Rollback from the retired Sprint 12 experiment is USB-only:
 
 ```powershell
 Copy-Item E:\lighty\cgi-bin\chumote\control.cgi.zurk-original E:\lighty\cgi-bin\chumote\control.cgi -Force
@@ -118,7 +102,7 @@ GET /music.m3u HTTP/1.1
 GET /cgi-bin/randomshuffler.sh HTTP/1.1
 ```
 
-This path is now the preferred evidence target. Sprint 13 should inspect the script and the playlist payload before changing any more radio endpoints.
+This path is now the preferred evidence target. Sprint 14 inspects the stock Play-button trigger before changing any more radio endpoints.
 ## Open Questions
 
 | Question | Next evidence needed |
@@ -126,4 +110,4 @@ This path is now the preferred evidence target. Sprint 13 should inspect the scr
 | Is there a separate Zurk radio preset database outside `control.cgi` on the full USB image? | Run Sprint 12 radio diagnostics on hardware with the full USB stick mounted. |
 | Does the Chumby build of `btplayd` support the Omrop Fryslan MP3 stream reliably? | Current evidence says no: repeat attempts can wedge `btplayd`; verify only after Sprint 13 player diagnostics. |
 | Are `radio2` and `radio3` still useful? | Hardware validation if those presets matter for the MVP. |
-| Which URL and event path does the audible stock radio widget use? | Inspect `/music.m3u`, `/cgi-bin/randomshuffler.sh`, and the playlist response captured while random radio is playing. |
+| Which exact event path does the audible stock music player use after the touchscreen Play button is pressed? | Compare Sprint 14 before/after snapshots from `/mnt/usb/ha-chumby/music-player-snapshot.sh`. |

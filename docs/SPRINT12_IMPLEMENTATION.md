@@ -6,11 +6,15 @@ Status: Sprint 12 radio preset modernization.
 
 Modernize the existing Chumote `radio1` preset without replacing the Zurk playback architecture.
 
+## Sprint 14 Supersession
+
+Sprint 12's radio URL patch is preserved here as historical evidence. It is no longer applied by the current USB preparation script. Sprint 14 restores the stock Random music configuration so the proven Music Player trigger can be reverse engineered without experimental stream changes.
+
 ## Implementation Summary
 
 Sprint 12 treats `control.cgi?radio1` as the existing control surface. Hardware validation showed that the endpoint reaches `btplayd` and sends a `playnow` request with the obsolete URL `http://66.162.107.142/cpr1_lo`.
 
-The installer now performs a constrained USB-side patch when the full Zurk file exists:
+Historical Sprint 12 implementation performed a constrained USB-side patch when the full Zurk file existed. Sprint 14 retires this from the current installer because hardware showed the patched direct playback path was not reliable:
 
 1. Locate `/lighty/cgi-bin/chumote/control.cgi` on the USB stick.
 2. Preserve the original as `/lighty/cgi-bin/chumote/control.cgi.zurk-original`.
@@ -150,7 +154,7 @@ Sprint 13 should inspect `randomshuffler.sh`, `/music.m3u`, and the playlist res
 
 | Area | Status | Evidence |
 | --- | --- | --- |
-| USB `control.cgi` patch | Confirmed | `radio1` resolves to the Omrop Fryslan URL. |
+| USB `control.cgi` patch | Retired in Sprint 14 | `radio1` resolved to the Omrop Fryslan URL, but the path did not produce reliable audio. |
 | Existing Chumote architecture | Preserved | `control.cgi` still calls `btplay`; `btplayd` receives `playnow`. |
 | Audible radio playback | Failed | No audio heard after `radio1`. |
 | `btplayd` stability | Failed after stream attempt | `btplayd` became unresponsive and failed restart after the patched stream. |

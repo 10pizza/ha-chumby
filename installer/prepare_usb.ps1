@@ -10,9 +10,6 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$legacyRadio1Url = "http://66.162.107.142/cpr1_lo"
-$modernRadio1Url = "https://d3pvma9xb2775h.cloudfront.net/icecast/omropfryslan/radio.mp3"
-$modernRadio1PlaylistUrl = "http://localhost/omrop-fryslan.m3u"
 $overlayRoot = Join-Path $PSScriptRoot "overlay"
 $resolvedUsb = (Resolve-Path -LiteralPath $UsbRoot).Path
 $resolvedZip = (Resolve-Path -LiteralPath $ZurkZip).Path
@@ -58,29 +55,6 @@ if (Test-Path -LiteralPath $firstTime) {
     [System.IO.File]::WriteAllText($firstTime, "0`n", [System.Text.Encoding]::ASCII)
 }
 
-$controlCgi = Join-Path $resolvedUsb "lighty\cgi-bin\chumote\control.cgi"
-if (Test-Path -LiteralPath $controlCgi) {
-    $controlText = [System.IO.File]::ReadAllText($controlCgi)
-    if ($controlText.Contains($legacyRadio1Url)) {
-        Copy-Item -LiteralPath $controlCgi -Destination (Join-Path (Split-Path -Parent $controlCgi) "control.cgi.zurk-original") -Force
-        $patchedControlText = $controlText.Replace($legacyRadio1Url, $modernRadio1Url)
-        [System.IO.File]::WriteAllText($controlCgi, $patchedControlText, [System.Text.Encoding]::ASCII)
-    }
-}
-
-
-$playlistPath = Join-Path $resolvedUsb "lighty\html\omrop-fryslan.m3u"
-$playlistDir = Split-Path -Parent $playlistPath
-if (Test-Path -LiteralPath $playlistDir) {
-    [System.IO.File]::WriteAllText($playlistPath, "$modernRadio1Url`n", [System.Text.Encoding]::ASCII)
-}
-
-$urlStreams = Join-Path $pspRoot "url_streams"
-if (Test-Path -LiteralPath $urlStreams) {
-    Copy-Item -LiteralPath $urlStreams -Destination (Join-Path $pspRoot "url_streams.ha-chumby-original") -Force
-    $streamXml = ('<streams><stream url="{0}" id="" mimetype="audio/x-mpegurl" name="Omrop Fryslan" /></streams>' -f $modernRadio1PlaylistUrl) + "`n"
-    [System.IO.File]::WriteAllText($urlStreams, $streamXml, [System.Text.Encoding]::ASCII)
-}
 
 $manifest = @(
     "HA-Chumby USB MVP manifest",
@@ -92,10 +66,9 @@ $manifest = @(
     "Original Zurk debugchumby backup: /debugchumby.zurk-original if present",
     "USB PSP configured-state marker: /psp/firsttime=0 when present",
     "Original Zurk firsttime backup: /psp/firsttime.zurk-original if present",
-    "Radio1 preset: legacy CPR URL replaced with Omrop Fryslan when /lighty/cgi-bin/chumote/control.cgi is present",
-    "Original control.cgi backup: /lighty/cgi-bin/chumote/control.cgi.zurk-original if patched",
-    "Omrop Fryslan playlist wrapper: /omrop-fryslan.m3u when /lighty/html exists",
-    "Stream list configured through /psp/url_streams with backup /psp/url_streams.ha-chumby-original when present"
+    "Stock music player configuration preserved for Sprint 14 trigger investigation",
+    "Random music path preserved: /psp/url_streams should continue to reference http://localhost/music.m3u",
+    "Diagnostic helper: /ha-chumby/music-player-snapshot.sh"
 )
 Set-Content -LiteralPath (Join-Path $resolvedUsb "HA-CHUMBY-MANIFEST.txt") -Value $manifest -Encoding ASCII
 
@@ -104,6 +77,7 @@ $requiredFiles = @(
     "HA-CHUMBY-MANIFEST.txt",
     "ha-chumby\start.sh",
     "ha-chumby\boot-screen.rgb565",
+    "ha-chumby\music-player-snapshot.sh",
     "psp\firsttime"
 )
 
@@ -120,4 +94,4 @@ if ($missing.Count -gt 0) {
 }
 
 Write-Host "HA-Chumby USB stick prepared at $resolvedUsb"
-Write-Host "Verified debugchumby, HA-CHUMBY-MANIFEST.txt, ha-chumby/start.sh, ha-chumby/boot-screen.rgb565, and psp/firsttime."
+Write-Host "Verified debugchumby, HA-CHUMBY-MANIFEST.txt, ha-chumby/start.sh, ha-chumby/boot-screen.rgb565, ha-chumby/music-player-snapshot.sh, and psp/firsttime."
